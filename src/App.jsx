@@ -5,6 +5,8 @@ import StudentTable from "./components/StudentTable";
 import StudentSignUp from "./components/StudentSignUp";
 import SignIn from "./components/SignIn";
 
+const API_URL = "https://student-json-server-1.onrender.com";
+
 function App() {
   // Initialize state from localStorage to persist login on refresh
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem("isLoggedIn") === "true");
@@ -32,11 +34,11 @@ function App() {
   // Fetch students for admin or current student
   const fetchStudents = () => {
     if (role === "admin") {
-      axios.get("http://localhost:5000/students")
+      axios.get(`${API_URL}/students`)
         .then(res => setStudents(res.data))
         .catch(err => console.error(err));
     } else {
-      axios.get(`http://localhost:5000/students?username=${username}`)
+      axios.get(`${API_URL}/students?username=${username}`)
         .then(res => setStudents(res.data))
         .catch(err => console.error(err));
     }
@@ -49,21 +51,21 @@ function App() {
   // Add student (only admin)
   const addStudent = (student) => {
     const studentWithUser = { ...student, username }; // attach admin username
-    axios.post("http://localhost:5000/students", studentWithUser)
+    axios.post(`${API_URL}/students`, studentWithUser)
       .then(res => setStudents([...students, res.data]))
       .catch(err => console.error(err));
   };
 
   // Delete student (only admin)
   const deleteStudent = (id) => {
-    axios.delete(`http://localhost:5000/students/${id}`)
+    axios.delete(`${API_URL}/students/${id}`)
       .then(() => setStudents(students.filter(s => s.id !== id)))
       .catch(err => console.error(err));
   };
 
   // Update student (only admin)
   const updateStudent = (id, updatedData) => {
-    axios.patch(`http://localhost:5000/students/${id}`, updatedData)
+    axios.patch(`${API_URL}/students/${id}`, updatedData)
       .then(() => fetchStudents())
       .catch(err => console.error(err));
   };
