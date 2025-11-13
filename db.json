@@ -6,12 +6,6 @@
       "password": "123",
       "role": "admin"
     },
-    {
-      "id": "52b4",
-      "username": "stu",
-      "password": "123",
-      "role": "student"
-    }
   ],
   "students": [
     {
