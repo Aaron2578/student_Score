@@ -4,7 +4,8 @@ import App from "./App.jsx";
 import SignIn from "./components/SignIn.jsx";
 import SignUp from "./components/SignUp.jsx";
 
-const API_URL = "http://localhost:5000";
+// const API_URL = "http://localhost:5000";
+const API_URL = "https://student-json-server-1.onrender.com";
 
 export default function MainPage() {
   const [feedbacks, setFeedbacks] = useState([]);

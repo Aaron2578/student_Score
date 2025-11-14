@@ -1,7 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000";
+// const API_URL = "http://localhost:5000";
+const API_URL = "https://student-json-server-1.onrender.com";
 
 export default function AdminStudentTable({ students, fetchStudents }) {
   const [newUsername, setNewUsername] = useState("");
