@@ -3,54 +3,51 @@ import axios from "axios";
 
 const API_URL = "https://student-json-server-1.onrender.com";
 
-function SignIn({ onLoginSuccess }) {
+export default function SignIn({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
+    if (!username || !password) return alert("Enter username and password");
+
     try {
-      const res = await axios.get(`${API_URL}/users`);
-      const users = res.data;
-      const user = users.find(u => u.username === username && u.password === password);
-      if (user) {
-        onLoginSuccess(user.username, user.role);
-      } else {
+      const res = await axios.get(`${API_URL}/users?username=${username}&password=${password}`);
+      if (res.data.length === 0) {
         alert("Invalid credentials");
+      } else {
+        const user = res.data[0];
+        onLoginSuccess(user.username, user.role); // ⚡ Important
       }
     } catch (err) {
       console.error(err);
-      alert("Error connecting to server. Please try again.");
     }
   };
 
   return (
-    <form onSubmit={handleLogin} className="bg-white p-4 rounded shadow-md w-80">
-      <h2 className="text-2xl font-bold text-center mb-4">Sign In</h2>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={e => setUsername(e.target.value)}
-        className="w-full mb-2 p-2 border rounded"
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        className="w-full mb-2 p-2 border rounded"
-        required
-      />
-      <button
-        type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded w-full"
-      >
-        Sign In
-      </button>
-    </form>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50 p-6">
+      <div className="bg-white p-8 rounded shadow-lg w-full max-w-sm">
+        <h2 className="text-2xl font-bold mb-6 text-gray-700">Login</h2>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          className="border w-full p-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          className="border w-full p-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <button
+          onClick={handleLogin}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-semibold"
+        >
+          Login
+        </button>
+      </div>
+    </div>
   );
 }
-
-export default SignIn;

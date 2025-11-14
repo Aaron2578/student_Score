@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API_URL = "https://student-json-server-1.onrender.com";
 
-export default function StudentTable({ students, fetchStudents }) {
+export default function AdminStudentTable({ students, fetchStudents }) {
   const [editingId, setEditingId] = useState(null);
   const [marks, setMarks] = useState(0);
 
@@ -12,17 +12,28 @@ export default function StudentTable({ students, fetchStudents }) {
     setMarks(student.marks || 0);
   };
 
-  const saveMarks = (id) => {
-    axios.patch(`${API_URL}/users/${id}`, { marks: Number(marks) })
-      .then(() => {
-        setEditingId(null);
-        fetchStudents(); // Refresh list
-      })
-      .catch(console.error);
+  const saveMarks = async (id) => {
+    try {
+      await axios.patch(`${API_URL}/users/${id}`, { marks: Number(marks) });
+      setEditingId(null);
+      fetchStudents();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const deleteStudent = async (id) => {
+    if (!window.confirm("Are you sure to delete this student?")) return;
+    try {
+      await axios.delete(`${API_URL}/users/${id}`);
+      fetchStudents();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6">
+    <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
       <h3 className="text-xl font-bold mb-4 text-gray-700">Students List</h3>
       <table className="table-auto w-full border-collapse">
         <thead>
@@ -66,6 +77,12 @@ export default function StudentTable({ students, fetchStudents }) {
                     Edit
                   </button>
                 )}
+                <button
+                  onClick={() => deleteStudent(student.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
