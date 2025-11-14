@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://student-json-server-1.onrender.com";
+const API_URL = "http://localhost:5000";
+// const API_URL = "https://student-json-server-1.onrender.com";
 
 export default function AdminFeedbackTable({ feedbacks, fetchFeedbacks }) {
   // Toggle visibility

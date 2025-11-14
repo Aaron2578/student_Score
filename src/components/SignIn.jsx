@@ -1,11 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
+import SignUp from "./SignUp.jsx";
 
-const API_URL = "https://student-json-server-1.onrender.com";
+const API_URL = "http://localhost:5000";
 
 export default function SignIn({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showSignUp, setShowSignUp] = useState(false);
 
   const handleLogin = async () => {
     if (!username || !password) return alert("Enter username and password");
@@ -16,12 +18,16 @@ export default function SignIn({ onLoginSuccess }) {
         alert("Invalid credentials");
       } else {
         const user = res.data[0];
-        onLoginSuccess(user.username, user.role); // ⚡ Important
+        onLoginSuccess(user.username, user.role);
       }
     } catch (err) {
       console.error(err);
     }
   };
+
+  if (showSignUp) {
+    return <SignUp onSignUpSuccess={() => setShowSignUp(false)} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50 p-6">
@@ -31,14 +37,14 @@ export default function SignIn({ onLoginSuccess }) {
           type="text"
           placeholder="Username"
           value={username}
-          onChange={e => setUsername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value)}
           className="border w-full p-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           className="border w-full p-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
         <button
@@ -47,6 +53,15 @@ export default function SignIn({ onLoginSuccess }) {
         >
           Login
         </button>
+        <p className="mt-4 text-center text-gray-600">
+          Don't have an account?{" "}
+          <button
+            onClick={() => setShowSignUp(true)}
+            className="text-green-500 underline"
+          >
+            Sign Up
+          </button>
+        </p>
       </div>
     </div>
   );

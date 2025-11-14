@@ -5,8 +5,9 @@ import AdminStudentTable from "./components/AdminStudentTable.jsx";
 import AdminFeedbackTable from "./components/AdminFeedbackTable.jsx";
 import StudentDashboard from "./components/StudentDashboard.jsx";
 
-
-const API_URL = "https://student-json-server-1.onrender.com";
+// Add this constant here!
+const API_URL = "http://localhost:5000"; 
+// const API_URL = "https://student-json-server-1.onrender.com";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

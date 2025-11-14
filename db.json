@@ -5,43 +5,9 @@
       "username": "admin",
       "password": "admin123",
       "role": "admin"
-    },
-    {
-      "id": "2",
-      "username": "student1",
-      "password": "1234",
-      "role": "student",
-      "marks": 90
-    },
-    {
-      "id": "3",
-      "username": "student2",
-      "password": "1234",
-      "role": "student",
-      "marks": 92
     }
   ],
   "feedbacks": [
-    {
-      "id": "1",
-      "studentUsername": "student1",
-      "text": "Great course!",
-      "rating": 5,
-      "visible": false
-    },
-    {
-      "id": "2",
-      "studentUsername": "student2",
-      "text": "Could be better",
-      "rating": 3,
-      "visible": false
-    },
-    {
-      "id": "bab8",
-      "studentUsername": "student1",
-      "text": "Nice",
-      "rating": 4,
-      "visible": true
-    }
+   
   ]
 }

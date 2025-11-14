@@ -1,17 +1,39 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API_URL = "https://student-json-server-1.onrender.com";
+const API_URL = "http://localhost:5000";
 
 export default function AdminStudentTable({ students, fetchStudents }) {
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [marks, setMarks] = useState(0);
 
+  // Add new student
+  const addStudent = async () => {
+    if (!newUsername || !newPassword) return alert("Enter username and password");
+    try {
+      await axios.post(`${API_URL}/users`, {
+        username: newUsername,
+        password: newPassword,
+        role: "student",
+        marks: 0
+      });
+      setNewUsername("");
+      setNewPassword("");
+      fetchStudents(); // refresh list
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Start editing marks
   const startEditing = (student) => {
     setEditingId(student.id);
     setMarks(student.marks || 0);
   };
 
+  // Save marks
   const saveMarks = async (id) => {
     try {
       await axios.patch(`${API_URL}/users/${id}`, { marks: Number(marks) });
@@ -22,6 +44,7 @@ export default function AdminStudentTable({ students, fetchStudents }) {
     }
   };
 
+  // Delete student
   const deleteStudent = async (id) => {
     if (!window.confirm("Are you sure to delete this student?")) return;
     try {
@@ -34,7 +57,33 @@ export default function AdminStudentTable({ students, fetchStudents }) {
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-      <h3 className="text-xl font-bold mb-4 text-gray-700">Students List</h3>
+      <h3 className="text-xl font-bold mb-4 text-gray-700">Manage Students</h3>
+
+      {/* Add Student */}
+      <div className="flex space-x-2 mb-4">
+        <input
+          type="text"
+          placeholder="Username"
+          value={newUsername}
+          onChange={(e) => setNewUsername(e.target.value)}
+          className="border p-2 rounded w-1/3"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="border p-2 rounded w-1/3"
+        />
+        <button
+          onClick={addStudent}
+          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+        >
+          Add
+        </button>
+      </div>
+
+      {/* Students Table */}
       <table className="table-auto w-full border-collapse">
         <thead>
           <tr className="bg-gray-200">
@@ -45,7 +94,7 @@ export default function AdminStudentTable({ students, fetchStudents }) {
           </tr>
         </thead>
         <tbody>
-          {students.map(student => (
+          {students.map((student) => (
             <tr key={student.id} className="hover:bg-gray-50">
               <td className="border px-4 py-2">{student.id}</td>
               <td className="border px-4 py-2">{student.username}</td>
