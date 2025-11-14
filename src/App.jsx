@@ -5,22 +5,16 @@ import AdminStudentTable from "./components/AdminStudentTable.jsx";
 import AdminFeedbackTable from "./components/AdminFeedbackTable.jsx";
 import StudentDashboard from "./components/StudentDashboard.jsx";
 
+// Add this constant here!
+// const API_URL = "http://localhost:5000"; 
 const API_URL = "https://student-json-server-1.onrender.com";
 
 function App() {
-  // Initialize state from localStorage
-  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem("isLoggedIn") === "true");
-  const [role, setRole] = useState(() => localStorage.getItem("role") || "");
-  const [username, setUsername] = useState(() => localStorage.getItem("username") || "");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState("");
+  const [username, setUsername] = useState("");
   const [students, setStudents] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
-
-  // Save login state to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("isLoggedIn", isLoggedIn);
-    localStorage.setItem("role", role);
-    localStorage.setItem("username", username);
-  }, [isLoggedIn, role, username]);
 
   const fetchStudents = () => {
     axios.get(`${API_URL}/users?role=student`)
@@ -48,7 +42,6 @@ function App() {
     setIsLoggedIn(false);
     setUsername("");
     setRole("");
-    localStorage.clear(); // clear persistent login
   };
 
   if (!isLoggedIn) return <SignIn onLoginSuccess={handleLogin} />;
