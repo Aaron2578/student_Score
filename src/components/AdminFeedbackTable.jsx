@@ -26,29 +26,47 @@ export default function AdminFeedbackTable({ feedbacks, fetchFeedbacks }) {
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-      <h3 className="text-xl font-bold mb-4 text-gray-700">Manage Feedbacks</h3>
-      <ul>
-        {feedbacks.map(f => (
-          <li key={f.id} className="flex justify-between items-center border-b py-2">
-            <div>
+    <div className="bg-white shadow-xl rounded-xl p-6 mb-6 w-full max-w-4xl mx-auto">
+      <h3 className="text-2xl font-bold mb-5 text-gray-800 text-center sm:text-left">
+        Manage Feedbacks
+      </h3>
+
+      <ul className="space-y-4">
+        {feedbacks.map((f) => (
+          <li
+            key={f.id}
+            className="border rounded-lg p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-gray-50 hover:bg-gray-100 transition"
+          >
+            {/* Feedback Content */}
+            <div className="text-gray-700">
               <span className="font-semibold">{f.studentUsername}:</span>{" "}
               <span>{f.text} </span>
-              <span className="text-yellow-500 font-bold">{'★'.repeat(f.rating)}</span>
-              {f.visible ? " (Visible)" : " (Hidden)"}
+              <span className="text-yellow-500 font-bold">
+                {"★".repeat(f.rating)}
+              </span>
+              <span className="ml-2 text-sm text-gray-500">
+                {f.visible ? "(Visible)" : "(Hidden)"}
+              </span>
             </div>
-            <div className="space-x-2">
+
+            {/* Buttons */}
+            <div className="flex gap-2 justify-end">
               <button
                 onClick={() => toggleVisibility(f.id, f.visible)}
-                className={`px-3 py-1 rounded text-white ${
-                  f.visible ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-                }`}
+                className={`px-4 py-2 rounded-lg text-white text-sm font-medium shadow
+                  ${
+                    f.visible
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-green-500 hover:bg-green-600"
+                  }
+                `}
               >
                 {f.visible ? "Hide" : "Approve"}
               </button>
+
               <button
                 onClick={() => deleteFeedback(f.id)}
-                className="px-3 py-1 rounded bg-gray-500 hover:bg-gray-600 text-white"
+                className="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium shadow"
               >
                 Delete
               </button>

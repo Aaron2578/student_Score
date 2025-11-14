@@ -22,19 +22,17 @@ export default function AdminStudentTable({ students, fetchStudents }) {
       });
       setNewUsername("");
       setNewPassword("");
-      fetchStudents(); // refresh list
+      fetchStudents();
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Start editing marks
   const startEditing = (student) => {
     setEditingId(student.id);
     setMarks(student.marks || 0);
   };
 
-  // Save marks
   const saveMarks = async (id) => {
     try {
       await axios.patch(`${API_URL}/users/${id}`, { marks: Number(marks) });
@@ -45,7 +43,6 @@ export default function AdminStudentTable({ students, fetchStudents }) {
     }
   };
 
-  // Delete student
   const deleteStudent = async (id) => {
     if (!window.confirm("Are you sure to delete this student?")) return;
     try {
@@ -57,87 +54,94 @@ export default function AdminStudentTable({ students, fetchStudents }) {
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-      <h3 className="text-xl font-bold mb-4 text-gray-700">Manage Students</h3>
+    <div className="bg-white shadow-xl rounded-xl p-6 mb-10 w-full max-w-5xl mx-auto">
+      <h3 className="text-2xl font-bold mb-6 text-gray-800 text-center sm:text-left">
+        Manage Students
+      </h3>
 
       {/* Add Student */}
-      <div className="flex space-x-2 mb-4">
+      <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0 mb-6">
         <input
           type="text"
           placeholder="Username"
           value={newUsername}
           onChange={(e) => setNewUsername(e.target.value)}
-          className="border p-2 rounded w-1/3"
+          className="border p-2 rounded w-full sm:w-1/3 focus:ring focus:ring-blue-200"
         />
         <input
           type="password"
           placeholder="Password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="border p-2 rounded w-1/3"
+          className="border p-2 rounded w-full sm:w-1/3 focus:ring focus:ring-blue-200"
         />
         <button
           onClick={addStudent}
-          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg w-full sm:w-auto shadow"
         >
           Add
         </button>
       </div>
 
       {/* Students Table */}
-      <table className="table-auto w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border px-4 py-2">ID</th>
-            <th className="border px-4 py-2">Username</th>
-            <th className="border px-4 py-2">Marks</th>
-            <th className="border px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student) => (
-            <tr key={student.id} className="hover:bg-gray-50">
-              <td className="border px-4 py-2">{student.id}</td>
-              <td className="border px-4 py-2">{student.username}</td>
-              <td className="border px-4 py-2">
-                {editingId === student.id ? (
-                  <input
-                    type="number"
-                    value={marks}
-                    onChange={(e) => setMarks(e.target.value)}
-                    className="border p-1 rounded w-20"
-                  />
-                ) : (
-                  student.marks
-                )}
-              </td>
-              <td className="border px-4 py-2 space-x-2">
-                {editingId === student.id ? (
-                  <button
-                    onClick={() => saveMarks(student.id)}
-                    className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
-                  >
-                    Save
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => startEditing(student)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                  >
-                    Edit
-                  </button>
-                )}
-                <button
-                  onClick={() => deleteStudent(student.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                >
-                  Delete
-                </button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="w-full border rounded-lg">
+          <thead>
+            <tr className="bg-gray-200 text-gray-700 text-sm sm:text-base">
+              <th className="border px-4 py-2">ID</th>
+              <th className="border px-4 py-2">Username</th>
+              <th className="border px-4 py-2">Marks</th>
+              <th className="border px-4 py-2">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {students.map((student) => (
+              <tr key={student.id} className="hover:bg-gray-50 text-sm sm:text-base">
+                <td className="border px-4 py-2">{student.id}</td>
+                <td className="border px-4 py-2">{student.username}</td>
+                <td className="border px-4 py-2 text-center">
+                  {editingId === student.id ? (
+                    <input
+                      type="number"
+                      value={marks}
+                      onChange={(e) => setMarks(e.target.value)}
+                      className="border p-1 rounded w-20 text-center"
+                    />
+                  ) : (
+                    student.marks
+                  )}
+                </td>
+
+                <td className="border px-4 py-2 flex flex-col sm:flex-row gap-2 justify-center">
+                  {editingId === student.id ? (
+                    <button
+                      onClick={() => saveMarks(student.id)}
+                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded shadow"
+                    >
+                      Save
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => startEditing(student)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded shadow"
+                    >
+                      Edit
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => deleteStudent(student.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

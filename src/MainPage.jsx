@@ -4,7 +4,6 @@ import App from "./App.jsx";
 import SignIn from "./components/SignIn.jsx";
 import SignUp from "./components/SignUp.jsx";
 
-// const API_URL = "http://localhost:5000";
 const API_URL = "https://student-json-server-1.onrender.com";
 
 export default function MainPage() {
@@ -23,11 +22,12 @@ export default function MainPage() {
       .catch(console.error);
   }, []);
 
+  // ✔ FIXED login
   const handleLoginSuccess = (username, role) => {
     setUsername(username);
     setRole(role);
     setIsLoggedIn(true);
-    setShowLogin(true);
+    setShowLogin(false);
     setShowSignUp(false);
   };
 
@@ -39,7 +39,7 @@ export default function MainPage() {
     setShowSignUp(false);
   };
 
-  // Show login/signup if user clicks login button
+  // Render Login / Sign Up page
   if (!isLoggedIn && (showLogin || showSignUp)) {
     return showSignUp ? (
       <SignUp onSignUpSuccess={handleLoginSuccess} />
@@ -51,54 +51,62 @@ export default function MainPage() {
     );
   }
 
+  // If logged in → go to Dashboard
   if (isLoggedIn) {
-    // Pass username & role to App (admin/student dashboard)
     return <App username={username} role={role} onLogout={handleLogout} />;
   }
 
-  // Landing page
+  // -----------------------------
+  // LANDING PAGE (Home Page)
+  // -----------------------------
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-8 font-sans">
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-6 md:p-12 font-sans">
+      {/* HEADER */}
+      <header className="flex flex-col md:flex-row justify-between items-center mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center md:text-left">
           Student Feedback Dashboard
         </h1>
-        <div className="space-x-2">
+
+        <div className="space-x-2 mt-4 md:mt-0">
           <button
             onClick={() => setShowLogin(true)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-lg transition"
           >
             Login
           </button>
+
           <button
             onClick={() => setShowSignUp(true)}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow"
+            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow-lg transition"
           >
             Student Sign Up
           </button>
         </div>
       </header>
 
+      {/* FEEDBACK CARDS */}
       {feedbacks.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg mt-20">
-          No feedback is available.
+        <p className="text-center text-gray-500 text-lg mt-16">
+          No feedback available.
         </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {feedbacks.map((f) => (
             <div
               key={f.id}
-              className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
+              className="bg-white p-6 rounded-xl shadow hover:shadow-xl border border-gray-100 transition"
             >
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold text-gray-700">
                   {f.studentUsername}
                 </span>
-                <span className="text-yellow-500 font-bold">
+
+                <span className="text-yellow-500 font-bold text-lg">
                   {"★".repeat(f.rating)}
                 </span>
               </div>
-              <p className="text-gray-600">{f.text}</p>
+
+              <p className="text-gray-600 text-sm md:text-base">{f.text}</p>
             </div>
           ))}
         </div>
