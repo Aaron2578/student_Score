@@ -1,50 +1,61 @@
 import { useState } from "react";
+import axios from "axios";
 
-export default function FeedbackForm({ submitFeedback }) {
-  const [text, setText] = useState("");
-  const [loading, setLoading] = useState(false);
+const API_URL = "https://student-json-server-1.onrender.com";
 
-  const handleSubmit = () => {
-    if (!text.trim()) return alert("Please enter your feedback.");
+export default function FeedbackPage() {
+  const [name, setName] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [feedback, setFeedback] = useState("");
 
-    setLoading(true);
+  const submitFeedback = () => {
+    if (!name || !designation || !feedback) {
+      alert("All fields are required");
+      return;
+    }
 
-    // Simulate short delay to show UX feedback
-    setTimeout(() => {
-      submitFeedback(text.trim());
-      setText("");
-      setLoading(false);
-    }, 300);
+    axios.post(`${API_URL}/feedbacks`, {
+      name,
+      designation,
+      feedback
+    }).then(() => {
+      alert("Feedback submitted!");
+      setName("");
+      setDesignation("");
+      setFeedback("");
+    });
   };
 
   return (
-    <div className="bg-white shadow-md rounded-xl p-5 sm:p-6 mb-6 transition-all">
-      <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">
-        Submit Feedback
-      </h3>
+    <div className="container">
+      <h2>Student Feedback</h2>
 
-      <textarea
-        className="border w-full p-3 rounded-md mb-4 text-sm sm:text-base
-                   focus:outline-none focus:ring-2 focus:ring-blue-500
-                   min-h-[120px] resize-none"
-        placeholder="Write your feedback..."
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+      <input 
+        type="text"
+        placeholder="Enter your name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
 
-      <button
-        onClick={handleSubmit}
-        disabled={loading || !text.trim()}
-        className={`w-full sm:w-auto px-5 py-2 rounded-md text-white font-medium 
-          transition-all
-          ${
-            loading || !text.trim()
-              ? "bg-blue-300 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
+      <select
+        value={designation}
+        onChange={(e) => setDesignation(e.target.value)}
       >
-        {loading ? "Submitting..." : "Submit"}
-      </button>
+        <option value="">Select Designation</option>
+        <option value="college_student">College Student</option>
+        <option value="working_professional">Working Professional</option>
+        <option value="school_student">School Student</option>
+        <option value="teacher">Teacher</option>
+        <option value="it_professional">IT Working Professional</option>
+      </select>
+
+      <textarea
+        placeholder="Enter your feedback"
+        value={feedback}
+        onChange={(e) => setFeedback(e.target.value)}
+      />
+
+      <button onClick={submitFeedback}>Submit</button>
     </div>
   );
 }

@@ -9,6 +9,7 @@ export default function StudentDashboard({ username }) {
   const [feedbackText, setFeedbackText] = useState("");
   const [rating, setRating] = useState(5);
   const [loading, setLoading] = useState(true);
+  const [designation, setDesignation] = useState("");
 
   // Fetch student info
   const fetchStudent = async () => {
@@ -23,7 +24,9 @@ export default function StudentDashboard({ username }) {
   // Fetch student's feedbacks
   const fetchFeedbacks = async () => {
     try {
-      const res = await axios.get(`${API_URL}/feedbacks?studentUsername=${username}`);
+      const res = await axios.get(
+        `${API_URL}/feedbacks?studentUsername=${username}`
+      );
       setFeedbacks(res.data);
     } catch (err) {
       console.error(err);
@@ -44,8 +47,10 @@ export default function StudentDashboard({ username }) {
         studentUsername: username,
         text: feedbackText,
         rating: Number(rating),
+        designation,
         visible: false,
       });
+
       setFeedbackText("");
       setRating(5);
       fetchFeedbacks();
@@ -67,7 +72,6 @@ export default function StudentDashboard({ username }) {
   return (
     <div className="min-h-screen p-6 md:p-10 bg-gradient-to-r from-blue-50 to-purple-50 font-sans">
       <div className="max-w-3xl mx-auto">
-
         {/* Welcome */}
         <h1 className="text-3xl md:text-4xl font-extrabold mb-6 text-gray-800 text-center md:text-left">
           Welcome, {student.username}!
@@ -86,6 +90,27 @@ export default function StudentDashboard({ username }) {
           <h2 className="text-xl md:text-2xl font-bold mb-4 text-gray-700">
             Add Feedback
           </h2>
+
+          <div className="flex flex-col sm:flex-row sm:items-center mb-3 gap-3">
+            <label className="font-semibold text-gray-700">Designation:</label>
+
+            <select
+              value={designation}
+              onChange={(e) => setDesignation(e.target.value)}
+              className="border rounded p-2"
+            >
+              <option value="">Select Designation</option>
+              <option value="School Student">School Student</option>
+              <option value="College Student">College Student</option>
+              <option value="Teacher">Teacher</option>
+              <option value="Professor">Professor</option>
+              <option value="IT Working Professional">
+                IT Working Professional
+              </option>
+              <option value="Working Professional">Non-IT Working Professional</option>
+              <option value="Job Seekers">Job Seekers</option>
+            </select>
+          </div>
 
           <textarea
             value={feedbackText}

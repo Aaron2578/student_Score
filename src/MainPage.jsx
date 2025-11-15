@@ -105,8 +105,11 @@ export default function MainPage() {
                   {"★".repeat(f.rating)}
                 </span>
               </div>
+              <p className="text-sm text-gray-500">
+                <strong>Designation:</strong> {f.designation || "Not Provided"}
+              </p>
 
-              <p className="text-gray-600 text-sm md:text-base">{f.text}</p>
+              <p className="text-gray-500 text-sm"><strong>Feedback:</strong> {f.text}</p>
             </div>
           ))}
         </div>
