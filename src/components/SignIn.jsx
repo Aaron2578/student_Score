@@ -23,6 +23,11 @@ export default function SignIn({ onLoginSuccess }) {
         alert("Invalid credentials");
       } else {
         const user = res.data[0];
+
+        // ⭐ SAVE LOGIN IN LOCAL STORAGE
+        localStorage.setItem("username", user.username);
+        localStorage.setItem("role", user.role);
+
         onLoginSuccess(user.username, user.role);
       }
     } catch (err) {

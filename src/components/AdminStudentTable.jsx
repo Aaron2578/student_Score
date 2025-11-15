@@ -12,6 +12,9 @@ export default function AdminStudentTable({ students, fetchStudents }) {
   const [totalMarks, setTotalMarks] = useState(0);
   const [outOf, setOutOf] = useState(0);
 
+  // ⭐ NEW STATE FOR EDITING DESIGNATION
+  const [editDesignation, setEditDesignation] = useState("");
+
   // Add new student
   const addStudent = async () => {
     if (!newUsername || !newPassword || !designation)
@@ -40,14 +43,21 @@ export default function AdminStudentTable({ students, fetchStudents }) {
     setEditingId(student.id);
     setTotalMarks(student.totalMarks || 0);
     setOutOf(student.outOf || 0);
+
+    // ⭐ LOAD CURRENT DESIGNATION FOR EDITING
+    setEditDesignation(student.designation || "");
   };
 
   const saveMarks = async (id) => {
     try {
       await axios.patch(`${API_URL}/users/${id}`, {
         totalMarks: Number(totalMarks),
-        outOf: Number(outOf)
+        outOf: Number(outOf),
+
+        // ⭐ SAVE NEW DESIGNATION
+        designation: editDesignation
       });
+
       setEditingId(null);
       fetchStudents();
     } catch (err) {
@@ -92,16 +102,14 @@ export default function AdminStudentTable({ students, fetchStudents }) {
           onChange={(e) => setDesignation(e.target.value)}
           className="border p-2 rounded w-full sm:w-1/4"
         >
-         <option value="">Select Designation</option>
-              <option value="School Student">School Student</option>
-              <option value="College Student">College Student</option>
-              <option value="Teacher">Teacher</option>
-              <option value="Assistant Professor">Assistant Professor</option>
-              <option value="IT Working Professional">
-                IT Working Professional
-              </option>
-              <option value="Working Professional">Non-IT Working Professional</option>
-              <option value="Job Seeker">Job Seeker</option>
+          <option value="">Select Designation</option>
+          <option value="School Student">School Student</option>
+          <option value="College Student">College Student</option>
+          <option value="Teacher">Teacher</option>
+          <option value="Assistant Professor">Assistant Professor</option>
+          <option value="IT Working Professional">IT Working Professional</option>
+          <option value="Working Professional">Non-IT Working Professional</option>
+          <option value="Job Seeker">Job Seeker</option>
         </select>
 
         <button
@@ -132,8 +140,25 @@ export default function AdminStudentTable({ students, fetchStudents }) {
                 <td className="border px-4 py-2">{student.id}</td>
                 <td className="border px-4 py-2">{student.username}</td>
 
+                {/* ⭐ CHANGE DESIGNATION WHEN EDITING */}
                 <td className="border px-4 py-2">
-                  {student.designation?.replace(/_/g, " ")}
+                  {editingId === student.id ? (
+                    <select
+                      value={editDesignation}
+                      onChange={(e) => setEditDesignation(e.target.value)}
+                      className="border p-1 rounded"
+                    >
+                      <option value="School Student">School Student</option>
+                      <option value="College Student">College Student</option>
+                      <option value="Teacher">Teacher</option>
+                      <option value="Assistant Professor">Assistant Professor</option>
+                      <option value="IT Working Professional">IT Working Professional</option>
+                      <option value="Working Professional">Non-IT Working Professional</option>
+                      <option value="Job Seeker">Job Seeker</option>
+                    </select>
+                  ) : (
+                    student.designation?.replace(/_/g, " ")
+                  )}
                 </td>
 
                 {/* Editable MARKS */}

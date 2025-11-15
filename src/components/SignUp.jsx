@@ -6,6 +6,7 @@ const API_URL = "https://student-json-server-1.onrender.com";
 export default function SignUp({ onSignUpSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [designation, setDesignation] = useState("Student");  // ✅ NEW
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
@@ -26,6 +27,7 @@ export default function SignUp({ onSignUpSuccess }) {
         username,
         password,
         role: "student",
+        designation,   // ✅ ADDED
         marks: 0
       });
 
@@ -48,6 +50,7 @@ export default function SignUp({ onSignUpSuccess }) {
         </h2>
 
         <div className="space-y-4">
+
           <input
             type="text"
             placeholder="Username"
@@ -63,6 +66,23 @@ export default function SignUp({ onSignUpSuccess }) {
             onChange={(e) => setPassword(e.target.value)}
             className="border w-full p-3 rounded-lg text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
+
+          {/* ✅ NEW DESIGNATION DROPDOWN */}
+          <select
+            value={designation}
+            onChange={(e) => setDesignation(e.target.value)}
+            className="border w-full p-3 rounded-lg text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+           <option value="School Student">School Student</option>
+              <option value="College Student">College Student</option>
+              <option value="Teacher">Teacher</option>
+              <option value="Assistant Professor">Assistant Professor</option>
+              <option value="IT Working Professional">
+                IT Working Professional
+              </option>
+              <option value="Working Professional">Non-IT Working Professional</option>
+              <option value="Job Seeker">Job Seeker</option>
+          </select>
 
           <button
             onClick={handleSignUp}

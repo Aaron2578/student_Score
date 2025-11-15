@@ -69,13 +69,25 @@ export default function StudentDashboard({ username }) {
     );
   }
 
+  // ⭐ COMPUTE PERCENTAGE
+  const percentage =
+    student.outOf > 0
+      ? ((student.totalMarks / student.outOf) * 100).toFixed(2)
+      : 0;
+
   return (
     <div className="min-h-screen p-6 md:p-10 bg-gradient-to-r from-blue-50 to-purple-50 font-sans">
       <div className="max-w-3xl mx-auto">
         {/* Welcome */}
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-6 text-gray-800 text-center md:text-left">
-          Welcome, {student.username}!
+        <h1 className="text-3xl md:text-xl font-extrabold mb-6 text-gray-800 text-center md:text-left">
+          Welcome, <span className="text-3xl text-green-500">{student.username}!</span>
         </h1>
+
+        {/* ⭐ SHOW DESIGNATION HERE */}
+        <p className="text-lg text-gray-700 mb-4">
+          <span className="font-semibold">Your Designation: </span>
+          {student.designation || "Not Added"}
+        </p>
 
         {/* Marks Card */}
         <div className="mb-6 bg-white p-5 rounded-lg shadow-md">
@@ -84,11 +96,36 @@ export default function StudentDashboard({ username }) {
             {student.totalMarks || 0}
           </p>
 
-          <p className="text-lg text-gray-700">
+          <p className="text-lg text-gray-700 mb-1">
             <span className="font-semibold">Out Of: </span>
             {student.outOf || 0}
           </p>
+
+          {/* ⭐ ADDED PERCENTAGE HERE */}
+          <p className="text-lg text-gray-700">
+            <span className="font-semibold">Percentage: </span>
+            {percentage}%
+          </p>
         </div>
+
+        {/* ⭐⭐⭐ SHOW MESSAGE BASED ON PERCENTAGE ⭐⭐⭐ */}
+        {percentage >= 90 ? (
+          <p className="p-4 bg-green-100 text-green-700 rounded-lg shadow mb-6">
+            🌟 Excellent Performance! Keep it up! {student.username}
+          </p>
+        ) : percentage >= 75 ? (
+          <p className="p-4 bg-blue-100 text-blue-700 rounded-lg shadow mb-6">
+            👍 Good Job! You can do even better! {student.username}
+          </p>
+        ) : percentage >= 50 ? (
+          <p className="p-4 bg-yellow-100 text-yellow-700 rounded-lg shadow mb-6">
+            ⚠️ Need Improvement! Stay focused. {student.username}
+          </p>
+        ) : (
+          <p className="p-4 bg-red-100 text-red-700 rounded-lg shadow mb-6">
+            ❌ Very Low Marks! Work harder! {student.username}
+          </p>
+        )}
 
         {/* Feedback Form */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -113,7 +150,9 @@ export default function StudentDashboard({ username }) {
               <option value="IT Working Professional">
                 IT Working Professional
               </option>
-              <option value="Working Professional">Non-IT Working Professional</option>
+              <option value="Working Professional">
+                Non-IT Working Professional
+              </option>
               <option value="Job Seeker">Job Seeker</option>
             </select>
           </div>
