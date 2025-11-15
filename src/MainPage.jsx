@@ -106,10 +106,10 @@ export default function MainPage() {
                 </span>
               </div>
               <p className="text-sm text-gray-500">
-                <strong>Designation:</strong> {f.designation || "Not Provided"}
+                <strong>Designation :</strong> {f.designation || "Not Provided"}
               </p>
 
-              <p className="text-gray-600 text-sm md:text-base"><strong>Feedback :</strong>{f.text}</p>
+              <p className="text-gray-600 text-sm md:text-base"><strong>Feedback :</strong> {f.text}</p>
             </div>
           ))}
         </div>
