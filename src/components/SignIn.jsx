@@ -1,13 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
-import SignUp from "./SignUp.jsx";
 
 const API_URL = "https://student-json-server-1.onrender.com";
 
-export default function SignIn({ onLoginSuccess }) {
+export default function SignIn({ onLoginSuccess, onShowSignUp }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showSignUp, setShowSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -24,11 +22,11 @@ export default function SignIn({ onLoginSuccess }) {
       } else {
         const user = res.data[0];
 
-        // ⭐ SAVE LOGIN IN LOCAL STORAGE
+        // SAVE LOGIN IN LOCAL STORAGE
         localStorage.setItem("username", user.username);
         localStorage.setItem("role", user.role);
 
-        onLoginSuccess(user.username, user.role);
+        onLoginSuccess(user.username, user.role); // notify parent
       }
     } catch (err) {
       console.error(err);
@@ -38,14 +36,9 @@ export default function SignIn({ onLoginSuccess }) {
     }
   };
 
-  if (showSignUp) {
-    return <SignUp onSignUpSuccess={() => setShowSignUp(false)} />;
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300 p-6">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm sm:max-w-md transition-all">
-
         <h2 className="text-3xl font-extrabold mb-6 text-gray-700 text-center">
           Login
         </h2>
@@ -83,7 +76,7 @@ export default function SignIn({ onLoginSuccess }) {
         <p className="mt-5 text-center text-gray-600 text-sm">
           Don't have an account?{" "}
           <button
-            onClick={() => setShowSignUp(true)}
+            onClick={onShowSignUp}
             className="text-green-600 font-semibold underline"
           >
             Sign Up

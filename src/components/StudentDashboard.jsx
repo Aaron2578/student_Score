@@ -75,6 +75,9 @@ export default function StudentDashboard({ username }) {
       ? ((student.totalMarks / student.outOf) * 100).toFixed(2)
       : 0;
 
+  // Check if performance message should be shown
+  const showMessage = student.totalMarks > 0 && student.outOf > 0;
+
   return (
     <div className="min-h-screen p-6 md:p-10 bg-gradient-to-r from-blue-50 to-purple-50 font-sans">
       <div className="max-w-3xl mx-auto">
@@ -101,31 +104,32 @@ export default function StudentDashboard({ username }) {
             {student.outOf || 0}
           </p>
 
-          {/* ⭐ ADDED PERCENTAGE HERE */}
+          {/* Always show percentage */}
           <p className="text-lg text-gray-700">
             <span className="font-semibold">Percentage: </span>
             {percentage}%
           </p>
         </div>
 
-        {/* ⭐⭐⭐ SHOW MESSAGE BASED ON PERCENTAGE ⭐⭐⭐ */}
-        {percentage >= 90 ? (
-          <p className="p-4 bg-green-100 text-green-700 rounded-lg shadow mb-6">
-            🌟 Excellent Performance! Keep it up! {student.username}
-          </p>
-        ) : percentage >= 75 ? (
-          <p className="p-4 bg-blue-100 text-blue-700 rounded-lg shadow mb-6">
-            👍 Good Job! You can do even better! {student.username}
-          </p>
-        ) : percentage >= 50 ? (
-          <p className="p-4 bg-yellow-100 text-yellow-700 rounded-lg shadow mb-6">
-            ⚠️ Need Improvement! Stay focused. {student.username}
-          </p>
-        ) : (
-          <p className="p-4 bg-red-100 text-red-700 rounded-lg shadow mb-6">
-            ❌ Very Low Marks! Work harder! {student.username}
-          </p>
-        )}
+        {/* ⭐ SHOW MESSAGE BASED ON PERCENTAGE ONLY IF showMessage */}
+        {showMessage &&
+          (percentage >= 90 ? (
+            <p className="p-4 bg-green-100 text-green-700 rounded-lg shadow mb-6">
+              🌟 Excellent Performance! Keep it up! {student.username}
+            </p>
+          ) : percentage >= 75 ? (
+            <p className="p-4 bg-blue-100 text-blue-700 rounded-lg shadow mb-6">
+              👍 Good Job! You can do even better! {student.username}
+            </p>
+          ) : percentage >= 50 ? (
+            <p className="p-4 bg-yellow-100 text-yellow-700 rounded-lg shadow mb-6">
+              ⚠️ Need Improvement! Stay focused. {student.username}
+            </p>
+          ) : (
+            <p className="p-4 bg-red-100 text-red-700 rounded-lg shadow mb-6">
+              ❌ Very Low Marks! Work harder! {student.username}
+            </p>
+          ))}
 
         {/* Feedback Form */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">

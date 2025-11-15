@@ -53,8 +53,6 @@ export default function AdminStudentTable({ students, fetchStudents }) {
       await axios.patch(`${API_URL}/users/${id}`, {
         totalMarks: Number(totalMarks),
         outOf: Number(outOf),
-
-        // ⭐ SAVE NEW DESIGNATION
         designation: editDesignation
       });
 
@@ -130,91 +128,102 @@ export default function AdminStudentTable({ students, fetchStudents }) {
               <th className="border px-4 py-2">Designation</th>
               <th className="border px-4 py-2">Total Marks</th>
               <th className="border px-4 py-2">Out Of</th>
+              <th className="border px-4 py-2">Percentage</th> {/* NEW COLUMN */}
               <th className="border px-4 py-2">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {students.map((student) => (
-              <tr key={student.id} className="hover:bg-gray-50">
-                <td className="border px-4 py-2">{student.id}</td>
-                <td className="border px-4 py-2">{student.username}</td>
+            {students.map((student) => {
+              const percentage =
+                student.outOf > 0
+                  ? ((student.totalMarks / student.outOf) * 100).toFixed(2)
+                  : "0";
 
-                {/* ⭐ CHANGE DESIGNATION WHEN EDITING */}
-                <td className="border px-4 py-2">
-                  {editingId === student.id ? (
-                    <select
-                      value={editDesignation}
-                      onChange={(e) => setEditDesignation(e.target.value)}
-                      className="border p-1 rounded"
-                    >
-                      <option value="School Student">School Student</option>
-                      <option value="College Student">College Student</option>
-                      <option value="Teacher">Teacher</option>
-                      <option value="Assistant Professor">Assistant Professor</option>
-                      <option value="IT Working Professional">IT Working Professional</option>
-                      <option value="Working Professional">Non-IT Working Professional</option>
-                      <option value="Job Seeker">Job Seeker</option>
-                    </select>
-                  ) : (
-                    student.designation?.replace(/_/g, " ")
-                  )}
-                </td>
+              return (
+                <tr key={student.id} className="hover:bg-gray-50">
+                  <td className="border px-4 py-2">{student.id}</td>
+                  <td className="border px-4 py-2">{student.username}</td>
 
-                {/* Editable MARKS */}
-                <td className="border px-4 py-2 text-center">
-                  {editingId === student.id ? (
-                    <input
-                      type="number"
-                      value={totalMarks}
-                      onChange={(e) => setTotalMarks(e.target.value)}
-                      className="border p-1 rounded w-20 text-center"
-                    />
-                  ) : (
-                    student.totalMarks
-                  )}
-                </td>
+                  {/* ⭐ CHANGE DESIGNATION WHEN EDITING */}
+                  <td className="border px-4 py-2">
+                    {editingId === student.id ? (
+                      <select
+                        value={editDesignation}
+                        onChange={(e) => setEditDesignation(e.target.value)}
+                        className="border p-1 rounded"
+                      >
+                        <option value="School Student">School Student</option>
+                        <option value="College Student">College Student</option>
+                        <option value="Teacher">Teacher</option>
+                        <option value="Assistant Professor">Assistant Professor</option>
+                        <option value="IT Working Professional">IT Working Professional</option>
+                        <option value="Working Professional">Non-IT Working Professional</option>
+                        <option value="Job Seeker">Job Seeker</option>
+                      </select>
+                    ) : (
+                      student.designation?.replace(/_/g, " ")
+                    )}
+                  </td>
 
-                {/* Editable OUT OF */}
-                <td className="border px-4 py-2 text-center">
-                  {editingId === student.id ? (
-                    <input
-                      type="number"
-                      value={outOf}
-                      onChange={(e) => setOutOf(e.target.value)}
-                      className="border p-1 rounded w-20 text-center"
-                    />
-                  ) : (
-                    student.outOf
-                  )}
-                </td>
+                  {/* Editable MARKS */}
+                  <td className="border px-4 py-2 text-center">
+                    {editingId === student.id ? (
+                      <input
+                        type="number"
+                        value={totalMarks}
+                        onChange={(e) => setTotalMarks(e.target.value)}
+                        className="border p-1 rounded w-20 text-center"
+                      />
+                    ) : (
+                      student.totalMarks
+                    )}
+                  </td>
 
-                <td className="border px-4 py-2 flex gap-2 justify-center">
-                  {editingId === student.id ? (
+                  {/* Editable OUT OF */}
+                  <td className="border px-4 py-2 text-center">
+                    {editingId === student.id ? (
+                      <input
+                        type="number"
+                        value={outOf}
+                        onChange={(e) => setOutOf(e.target.value)}
+                        className="border p-1 rounded w-20 text-center"
+                      />
+                    ) : (
+                      student.outOf
+                    )}
+                  </td>
+
+                  {/* NEW PERCENTAGE COLUMN */}
+                  <td className="border px-4 py-2 text-center">{percentage}%</td>
+
+                  <td className="border px-4 py-2 flex gap-2 justify-center">
+                    {editingId === student.id ? (
+                      <button
+                        onClick={() => saveMarks(student.id)}
+                        className="bg-green-500 text-white px-3 py-1 rounded"
+                      >
+                        Save
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => startEditing(student)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded"
+                      >
+                        Edit
+                      </button>
+                    )}
+
                     <button
-                      onClick={() => saveMarks(student.id)}
-                      className="bg-green-500 text-white px-3 py-1 rounded"
+                      onClick={() => deleteStudent(student.id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded"
                     >
-                      Save
+                      Delete
                     </button>
-                  ) : (
-                    <button
-                      onClick={() => startEditing(student)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded"
-                    >
-                      Edit
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => deleteStudent(student.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

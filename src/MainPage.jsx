@@ -15,19 +15,6 @@ export default function MainPage() {
   const [username, setUsername] = useState("");
   const [role, setRole] = useState("");
 
-  // Load persistent login from localStorage
-  useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-    const savedRole = localStorage.getItem("role");
-
-    if (savedUsername && savedRole) {
-      setUsername(savedUsername);
-      setRole(savedRole);
-      setIsLoggedIn(true);
-    }
-  }, []);
-
-  // Fetch visible feedbacks
   useEffect(() => {
     axios
       .get(`${API_URL}/feedbacks?visible=true`)
@@ -35,31 +22,24 @@ export default function MainPage() {
       .catch(console.error);
   }, []);
 
-  // Handle login success
+  // ✔ FIXED login
   const handleLoginSuccess = (username, role) => {
     setUsername(username);
     setRole(role);
     setIsLoggedIn(true);
     setShowLogin(false);
     setShowSignUp(false);
-
-    localStorage.setItem("username", username);
-    localStorage.setItem("role", role);
   };
 
-  // Handle logout
   const handleLogout = () => {
     setUsername("");
     setRole("");
     setIsLoggedIn(false);
     setShowLogin(false);
     setShowSignUp(false);
-
-    localStorage.removeItem("username");
-    localStorage.removeItem("role");
   };
 
-  // Render login/signup page
+  // Render Login / Sign Up page
   if (!isLoggedIn && (showLogin || showSignUp)) {
     return showSignUp ? (
       <SignUp onSignUpSuccess={handleLoginSuccess} />
@@ -71,13 +51,13 @@ export default function MainPage() {
     );
   }
 
-  // Show dashboard if logged in
+  // If logged in → go to Dashboard
   if (isLoggedIn) {
     return <App username={username} role={role} onLogout={handleLogout} />;
   }
 
   // -----------------------------
-  // LANDING PAGE (feedback cards view)
+  // LANDING PAGE (Home Page)
   // -----------------------------
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-6 md:p-12 font-sans">
@@ -120,6 +100,7 @@ export default function MainPage() {
                 <span className="font-semibold text-gray-700">
                   {f.studentUsername}
                 </span>
+
                 <span className="text-yellow-500 font-bold text-lg">
                   {"★".repeat(f.rating)}
                 </span>
@@ -127,9 +108,8 @@ export default function MainPage() {
               <p className="text-sm text-gray-500">
                 <strong>Designation:</strong> {f.designation || "Not Provided"}
               </p>
-              <p className="text-gray-500 text-sm">
-                <strong>Feedback:</strong> {f.text}
-              </p>
+
+              <p className="text-gray-600 text-sm md:text-base"><strong>Feedback :</strong>{f.text}</p>
             </div>
           ))}
         </div>
