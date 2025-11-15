@@ -1,27 +1,35 @@
 import { useState } from "react";
 import axios from "axios";
 
-// const API_URL = "http://localhost:5000";
 const API_URL = "https://student-json-server-1.onrender.com";
 
 export default function AdminStudentTable({ students, fetchStudents }) {
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [designation, setDesignation] = useState("");
+
   const [editingId, setEditingId] = useState(null);
-  const [marks, setMarks] = useState(0);
+  const [totalMarks, setTotalMarks] = useState(0);
+  const [outOf, setOutOf] = useState(0);
 
   // Add new student
   const addStudent = async () => {
-    if (!newUsername || !newPassword) return alert("Enter username and password");
+    if (!newUsername || !newPassword || !designation)
+      return alert("Enter username, password and designation");
+
     try {
       await axios.post(`${API_URL}/users`, {
         username: newUsername,
         password: newPassword,
         role: "student",
-        marks: 0
+        designation,
+        totalMarks: 0,
+        outOf: 0
       });
+
       setNewUsername("");
       setNewPassword("");
+      setDesignation("");
       fetchStudents();
     } catch (err) {
       console.error(err);
@@ -30,12 +38,16 @@ export default function AdminStudentTable({ students, fetchStudents }) {
 
   const startEditing = (student) => {
     setEditingId(student.id);
-    setMarks(student.marks || 0);
+    setTotalMarks(student.totalMarks || 0);
+    setOutOf(student.outOf || 0);
   };
 
   const saveMarks = async (id) => {
     try {
-      await axios.patch(`${API_URL}/users/${id}`, { marks: Number(marks) });
+      await axios.patch(`${API_URL}/users/${id}`, {
+        totalMarks: Number(totalMarks),
+        outOf: Number(outOf)
+      });
       setEditingId(null);
       fetchStudents();
     } catch (err) {
@@ -54,10 +66,8 @@ export default function AdminStudentTable({ students, fetchStudents }) {
   };
 
   return (
-    <div className="bg-white shadow-xl rounded-xl p-6 mb-10 w-full max-w-5xl mx-auto">
-      <h3 className="text-2xl font-bold mb-6 text-gray-800 text-center sm:text-left">
-        Manage Students
-      </h3>
+    <div className="bg-white shadow-xl rounded-xl p-6 mb-10 w-full max-w-6xl mx-auto">
+      <h3 className="text-2xl font-bold mb-6 text-gray-800">Manage Students</h3>
 
       {/* Add Student */}
       <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0 mb-6">
@@ -66,18 +76,33 @@ export default function AdminStudentTable({ students, fetchStudents }) {
           placeholder="Username"
           value={newUsername}
           onChange={(e) => setNewUsername(e.target.value)}
-          className="border p-2 rounded w-full sm:w-1/3 focus:ring focus:ring-blue-200"
+          className="border p-2 rounded w-full sm:w-1/4"
         />
+
         <input
           type="password"
           placeholder="Password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="border p-2 rounded w-full sm:w-1/3 focus:ring focus:ring-blue-200"
+          className="border p-2 rounded w-full sm:w-1/4"
         />
+
+        <select
+          value={designation}
+          onChange={(e) => setDesignation(e.target.value)}
+          className="border p-2 rounded w-full sm:w-1/4"
+        >
+          <option value="">Select Designation</option>
+          <option value="college_student">College Student</option>
+          <option value="working_professional">Working Professional</option>
+          <option value="school_student">School Student</option>
+          <option value="teacher">Teacher</option>
+          <option value="it_professional">IT Working Professional</option>
+        </select>
+
         <button
           onClick={addStudent}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg w-full sm:w-auto shadow"
+          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
         >
           Add
         </button>
@@ -87,44 +112,66 @@ export default function AdminStudentTable({ students, fetchStudents }) {
       <div className="overflow-x-auto">
         <table className="w-full border rounded-lg">
           <thead>
-            <tr className="bg-gray-200 text-gray-700 text-sm sm:text-base">
+            <tr className="bg-gray-200 text-gray-700">
               <th className="border px-4 py-2">ID</th>
               <th className="border px-4 py-2">Username</th>
-              <th className="border px-4 py-2">Marks</th>
+              <th className="border px-4 py-2">Designation</th>
+              <th className="border px-4 py-2">Total Marks</th>
+              <th className="border px-4 py-2">Out Of</th>
               <th className="border px-4 py-2">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {students.map((student) => (
-              <tr key={student.id} className="hover:bg-gray-50 text-sm sm:text-base">
+              <tr key={student.id} className="hover:bg-gray-50">
                 <td className="border px-4 py-2">{student.id}</td>
                 <td className="border px-4 py-2">{student.username}</td>
+
+                <td className="border px-4 py-2">
+                  {student.designation?.replace(/_/g, " ")}
+                </td>
+
+                {/* Editable MARKS */}
                 <td className="border px-4 py-2 text-center">
                   {editingId === student.id ? (
                     <input
                       type="number"
-                      value={marks}
-                      onChange={(e) => setMarks(e.target.value)}
+                      value={totalMarks}
+                      onChange={(e) => setTotalMarks(e.target.value)}
                       className="border p-1 rounded w-20 text-center"
                     />
                   ) : (
-                    student.marks
+                    student.totalMarks
                   )}
                 </td>
 
-                <td className="border px-4 py-2 flex flex-col sm:flex-row gap-2 justify-center">
+                {/* Editable OUT OF */}
+                <td className="border px-4 py-2 text-center">
+                  {editingId === student.id ? (
+                    <input
+                      type="number"
+                      value={outOf}
+                      onChange={(e) => setOutOf(e.target.value)}
+                      className="border p-1 rounded w-20 text-center"
+                    />
+                  ) : (
+                    student.outOf
+                  )}
+                </td>
+
+                <td className="border px-4 py-2 flex gap-2 justify-center">
                   {editingId === student.id ? (
                     <button
                       onClick={() => saveMarks(student.id)}
-                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded shadow"
+                      className="bg-green-500 text-white px-3 py-1 rounded"
                     >
                       Save
                     </button>
                   ) : (
                     <button
                       onClick={() => startEditing(student)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded shadow"
+                      className="bg-blue-500 text-white px-3 py-1 rounded"
                     >
                       Edit
                     </button>
@@ -132,7 +179,7 @@ export default function AdminStudentTable({ students, fetchStudents }) {
 
                   <button
                     onClick={() => deleteStudent(student.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded shadow"
+                    className="bg-red-500 text-white px-3 py-1 rounded"
                   >
                     Delete
                   </button>

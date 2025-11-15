@@ -79,9 +79,14 @@ export default function StudentDashboard({ username }) {
 
         {/* Marks Card */}
         <div className="mb-6 bg-white p-5 rounded-lg shadow-md">
-          <p className="text-lg text-gray-700">
+          <p className="text-lg text-gray-700 mb-1">
             <span className="font-semibold">Your Marks: </span>
             {student.marks || 0}
+          </p>
+
+          <p className="text-lg text-gray-700">
+            <span className="font-semibold">Out Of: </span>
+            {student.outOf || 0}
           </p>
         </div>
 
@@ -91,6 +96,7 @@ export default function StudentDashboard({ username }) {
             Add Feedback
           </h2>
 
+          {/* Designation */}
           <div className="flex flex-col sm:flex-row sm:items-center mb-3 gap-3">
             <label className="font-semibold text-gray-700">Designation:</label>
 
@@ -103,15 +109,16 @@ export default function StudentDashboard({ username }) {
               <option value="School Student">School Student</option>
               <option value="College Student">College Student</option>
               <option value="Teacher">Teacher</option>
-              <option value="Assitant Professor">Assitant Professor</option>
+              <option value="Assistant Professor">Assistant Professor</option>
               <option value="IT Working Professional">
                 IT Working Professional
               </option>
               <option value="Working Professional">Non-IT Working Professional</option>
-              <option value="Job Seekers">Job Seekers</option>
+              <option value="Job Seeker">Job Seeker</option>
             </select>
           </div>
 
+          {/* Feedback Text */}
           <textarea
             value={feedbackText}
             onChange={(e) => setFeedbackText(e.target.value)}
@@ -120,6 +127,7 @@ export default function StudentDashboard({ username }) {
             rows="3"
           />
 
+          {/* Rating */}
           <div className="flex flex-col sm:flex-row sm:items-center mb-3 gap-3">
             <label className="font-semibold text-gray-700">Rating:</label>
             <select
