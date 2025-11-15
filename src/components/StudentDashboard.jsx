@@ -81,7 +81,7 @@ export default function StudentDashboard({ username }) {
         <div className="mb-6 bg-white p-5 rounded-lg shadow-md">
           <p className="text-lg text-gray-700 mb-1">
             <span className="font-semibold">Your Marks: </span>
-            {student.marks || 0}
+            {student.totalMarks || 0}
           </p>
 
           <p className="text-lg text-gray-700">

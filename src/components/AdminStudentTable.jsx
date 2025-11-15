@@ -92,12 +92,16 @@ export default function AdminStudentTable({ students, fetchStudents }) {
           onChange={(e) => setDesignation(e.target.value)}
           className="border p-2 rounded w-full sm:w-1/4"
         >
-          <option value="">Select Designation</option>
-          <option value="college_student">College Student</option>
-          <option value="working_professional">Working Professional</option>
-          <option value="school_student">School Student</option>
-          <option value="teacher">Teacher</option>
-          <option value="it_professional">IT Working Professional</option>
+         <option value="">Select Designation</option>
+              <option value="School Student">School Student</option>
+              <option value="College Student">College Student</option>
+              <option value="Teacher">Teacher</option>
+              <option value="Assistant Professor">Assistant Professor</option>
+              <option value="IT Working Professional">
+                IT Working Professional
+              </option>
+              <option value="Working Professional">Non-IT Working Professional</option>
+              <option value="Job Seeker">Job Seeker</option>
         </select>
 
         <button
