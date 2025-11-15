@@ -103,7 +103,7 @@ export default function StudentDashboard({ username }) {
               <option value="School Student">School Student</option>
               <option value="College Student">College Student</option>
               <option value="Teacher">Teacher</option>
-              <option value="Professor">Professor</option>
+              <option value="Assitant Professor">Assitant Professor</option>
               <option value="IT Working Professional">
                 IT Working Professional
               </option>
