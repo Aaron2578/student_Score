@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { supabase } from "../supabaseClient";
 
-const API_URL = "https://student-json-server-1.onrender.com";
-
-export default function StudentDashboard({ username }) {
+export default function StudentDashboard({ username, userId }) {
   const [student, setStudent] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
   const [feedbackText, setFeedbackText] = useState("");
@@ -14,8 +12,14 @@ export default function StudentDashboard({ username }) {
   // Fetch student info
   const fetchStudent = async () => {
     try {
-      const res = await axios.get(`${API_URL}/users?username=${username}`);
-      setStudent(res.data[0]);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error) throw error;
+      setStudent(data);
     } catch (err) {
       console.error(err);
     }
@@ -24,10 +28,15 @@ export default function StudentDashboard({ username }) {
   // Fetch student's feedbacks
   const fetchFeedbacks = async () => {
     try {
-      const res = await axios.get(
-        `${API_URL}/feedbacks?studentUsername=${username}`
-      );
-      setFeedbacks(res.data);
+      const { data, error } = await supabase
+        .from('feedbacks')
+        .select('*')
+        .eq('student_username', username)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setFeedbacks(data || []);
+
     } catch (err) {
       console.error(err);
     }
@@ -43,13 +52,19 @@ export default function StudentDashboard({ username }) {
     if (!feedbackText.trim()) return alert("Feedback cannot be empty!");
 
     try {
-      await axios.post(`${API_URL}/feedbacks`, {
-        studentUsername: username,
-        text: feedbackText,
-        rating: Number(rating),
-        designation,
-        visible: false,
-      });
+      const { error } = await supabase
+        .from('feedbacks')
+        .insert([
+          {
+            student_username: username,
+            text: feedbackText,
+            rating: Number(rating),
+            designation,
+            visible: false,
+          },
+        ]);
+
+      if (error) throw error;
 
       setFeedbackText("");
       setRating(5);
@@ -57,6 +72,7 @@ export default function StudentDashboard({ username }) {
       alert("Feedback submitted! Waiting for admin approval.");
     } catch (err) {
       console.error(err);
+      alert("Error submitting feedback.");
     }
   };
 
@@ -69,14 +85,16 @@ export default function StudentDashboard({ username }) {
     );
   }
 
+  if (!student) return <div className="p-10 text-center">Student not found.</div>;
+
   // ⭐ COMPUTE PERCENTAGE
   const percentage =
-    student.outOf > 0
-      ? ((student.totalMarks / student.outOf) * 100).toFixed(2)
+    student.out_of > 0
+      ? ((student.total_marks / student.out_of) * 100).toFixed(2)
       : 0;
 
   // Check if performance message should be shown
-  const showMessage = student.totalMarks > 0 && student.outOf > 0;
+  const showMessage = student.total_marks > 0 && student.out_of > 0;
 
   return (
     <div className="min-h-screen p-6 md:p-10 bg-gradient-to-r from-blue-50 to-purple-50 font-sans">
@@ -96,12 +114,12 @@ export default function StudentDashboard({ username }) {
         <div className="mb-6 bg-white p-5 rounded-lg shadow-md">
           <p className="text-lg text-gray-700 mb-1">
             <span className="font-semibold">Your Marks: </span>
-            {student.totalMarks || 0}
+            {student.total_marks || 0}
           </p>
 
           <p className="text-lg text-gray-700 mb-1">
             <span className="font-semibold">Out Of: </span>
-            {student.outOf || 0}
+            {student.out_of || 0}
           </p>
 
           {/* Always show percentage */}

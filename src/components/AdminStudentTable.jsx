@@ -1,11 +1,8 @@
 import { useState } from "react";
-import axios from "axios";
-
-const API_URL = "https://student-json-server-1.onrender.com";
+import { supabase } from "../supabaseClient";
 
 export default function AdminStudentTable({ students, fetchStudents }) {
   const [newUsername, setNewUsername] = useState("");
-  const [newPassword, setNewPassword] = useState("");
   const [designation, setDesignation] = useState("");
 
   const [editingId, setEditingId] = useState(null);
@@ -15,24 +12,37 @@ export default function AdminStudentTable({ students, fetchStudents }) {
   // ⭐ NEW STATE FOR EDITING DESIGNATION
   const [editDesignation, setEditDesignation] = useState("");
 
-  // Add new student
-  const addStudent = async () => {
-    if (!newUsername || !newPassword || !designation)
-      return alert("Enter username, password and designation");
-
+  // Update profile
+  const saveMarks = async (id) => {
     try {
-      await axios.post(`${API_URL}/users`, {
-        username: newUsername,
-        password: newPassword,
-        role: "student",
-        designation,
-        totalMarks: 0,
-        outOf: 0
-      });
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          total_marks: Number(totalMarks),
+          out_of: Number(outOf),
+          designation: editDesignation
+        })
+        .eq('id', id);
 
-      setNewUsername("");
-      setNewPassword("");
-      setDesignation("");
+      if (error) throw error;
+
+      setEditingId(null);
+      fetchStudents();
+    } catch (err) {
+      console.error(err);
+      alert("Error saving data");
+    }
+  };
+
+  const deleteStudent = async (id) => {
+    if (!window.confirm("Are you sure to delete this student's profile? Auth user will remain.")) return;
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
       fetchStudents();
     } catch (err) {
       console.error(err);
@@ -41,82 +51,18 @@ export default function AdminStudentTable({ students, fetchStudents }) {
 
   const startEditing = (student) => {
     setEditingId(student.id);
-    setTotalMarks(student.totalMarks || 0);
-    setOutOf(student.outOf || 0);
-
-    // ⭐ LOAD CURRENT DESIGNATION FOR EDITING
+    setTotalMarks(student.total_marks || 0);
+    setOutOf(student.out_of || 0);
     setEditDesignation(student.designation || "");
-  };
-
-  const saveMarks = async (id) => {
-    try {
-      await axios.patch(`${API_URL}/users/${id}`, {
-        totalMarks: Number(totalMarks),
-        outOf: Number(outOf),
-        designation: editDesignation
-      });
-
-      setEditingId(null);
-      fetchStudents();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const deleteStudent = async (id) => {
-    if (!window.confirm("Are you sure to delete this student?")) return;
-    try {
-      await axios.delete(`${API_URL}/users/${id}`);
-      fetchStudents();
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   return (
     <div className="bg-white shadow-xl rounded-xl p-6 mb-10 w-full max-w-6xl mx-auto">
       <h3 className="text-2xl font-bold mb-6 text-gray-800">Manage Students</h3>
 
-      {/* Add Student */}
-      <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0 mb-6">
-        <input
-          type="text"
-          placeholder="Username"
-          value={newUsername}
-          onChange={(e) => setNewUsername(e.target.value)}
-          className="border p-2 rounded w-full sm:w-1/4"
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          className="border p-2 rounded w-full sm:w-1/4"
-        />
-
-        <select
-          value={designation}
-          onChange={(e) => setDesignation(e.target.value)}
-          className="border p-2 rounded w-full sm:w-1/4"
-        >
-          <option value="">Select Designation</option>
-          <option value="School Student">School Student</option>
-          <option value="College Student">College Student</option>
-          <option value="Teacher">Teacher</option>
-          <option value="Assistant Professor">Assistant Professor</option>
-          <option value="IT Working Professional">IT Working Professional</option>
-          <option value="Working Professional">Non-IT Working Professional</option>
-          <option value="Job Seeker">Job Seeker</option>
-        </select>
-
-        <button
-          onClick={addStudent}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
-        >
-          Add
-        </button>
-      </div>
+      <p className="mb-4 text-sm text-gray-500 italic">
+        Note: Use Supabase Dashboard to manage Auth Users. This table manages user profiles.
+      </p>
 
       {/* Students Table */}
       <div className="overflow-x-auto">
@@ -128,24 +74,23 @@ export default function AdminStudentTable({ students, fetchStudents }) {
               <th className="border px-4 py-2">Designation</th>
               <th className="border px-4 py-2">Total Marks</th>
               <th className="border px-4 py-2">Out Of</th>
-              <th className="border px-4 py-2">Percentage</th> {/* NEW COLUMN */}
+              <th className="border px-4 py-2">Percentage</th>
               <th className="border px-4 py-2">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {students.map((student) => {
+            {(students || []).map((student) => {
               const percentage =
-                student.outOf > 0
-                  ? ((student.totalMarks / student.outOf) * 100).toFixed(2)
+                student.out_of > 0
+                  ? ((student.total_marks / student.out_of) * 100).toFixed(2)
                   : "0";
 
               return (
                 <tr key={student.id} className="hover:bg-gray-50">
-                  <td className="border px-4 py-2">{student.id}</td>
+                  <td className="border px-4 py-2 text-xs">{student.id}</td>
                   <td className="border px-4 py-2">{student.username}</td>
 
-                  {/* ⭐ CHANGE DESIGNATION WHEN EDITING */}
                   <td className="border px-4 py-2">
                     {editingId === student.id ? (
                       <select
@@ -166,7 +111,6 @@ export default function AdminStudentTable({ students, fetchStudents }) {
                     )}
                   </td>
 
-                  {/* Editable MARKS */}
                   <td className="border px-4 py-2 text-center">
                     {editingId === student.id ? (
                       <input
@@ -176,11 +120,10 @@ export default function AdminStudentTable({ students, fetchStudents }) {
                         className="border p-1 rounded w-20 text-center"
                       />
                     ) : (
-                      student.totalMarks
+                      student.total_marks
                     )}
                   </td>
 
-                  {/* Editable OUT OF */}
                   <td className="border px-4 py-2 text-center">
                     {editingId === student.id ? (
                       <input
@@ -190,11 +133,10 @@ export default function AdminStudentTable({ students, fetchStudents }) {
                         className="border p-1 rounded w-20 text-center"
                       />
                     ) : (
-                      student.outOf
+                      student.out_of
                     )}
                   </td>
 
-                  {/* NEW PERCENTAGE COLUMN */}
                   <td className="border px-4 py-2 text-center">{percentage}%</td>
 
                   <td className="border px-4 py-2 flex gap-2 justify-center">
