@@ -19,12 +19,14 @@ export default function SignUp({ onSignUpSuccess }) {
         email,
         password,
         options: {
+          emailRedirectTo: window.location.origin,
           data: {
             username,
             designation,
           },
         },
       });
+
 
       if (authError) throw authError;
 
