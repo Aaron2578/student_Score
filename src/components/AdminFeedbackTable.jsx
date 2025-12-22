@@ -1,16 +1,19 @@
-import axios from "axios";
-
-// const API_URL = "http://localhost:5000";
-const API_URL = "https://student-json-server-1.onrender.com";
+import { supabase } from "../supabaseClient";
 
 export default function AdminFeedbackTable({ feedbacks, fetchFeedbacks }) {
   // Toggle visibility
   const toggleVisibility = async (id, visible) => {
     try {
-      await axios.patch(`${API_URL}/feedbacks/${id}`, { visible: !visible });
+      const { error } = await supabase
+        .from('feedbacks')
+        .update({ visible: !visible })
+        .eq('id', id);
+      
+      if (error) throw error;
       fetchFeedbacks();
     } catch (err) {
       console.error(err);
+      alert("Error updating feedback visibility");
     }
   };
 
@@ -18,7 +21,12 @@ export default function AdminFeedbackTable({ feedbacks, fetchFeedbacks }) {
   const deleteFeedback = async (id) => {
     if (!window.confirm("Are you sure you want to delete this feedback?")) return;
     try {
-      await axios.delete(`${API_URL}/feedbacks/${id}`);
+      const { error } = await supabase
+        .from('feedbacks')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
       fetchFeedbacks();
     } catch (err) {
       console.error(err);
@@ -32,15 +40,16 @@ export default function AdminFeedbackTable({ feedbacks, fetchFeedbacks }) {
       </h3>
 
       <ul className="space-y-4">
-        {feedbacks.map((f) => (
+        {(feedbacks || []).map((f) => (
           <li
             key={f.id}
             className="border rounded-lg p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-gray-50 hover:bg-gray-100 transition"
           >
             {/* Feedback Content */}
             <div className="text-gray-700">
-              <span className="font-semibold">{f.studentUsername}:</span>{" "}
+              <span className="font-semibold">{f.student_username}:</span>{" "}
               <span>{f.text} </span>
+
               <span className="text-yellow-500 font-bold">
                 {"★".repeat(f.rating)}
               </span>

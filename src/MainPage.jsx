@@ -1,59 +1,66 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { supabase } from "./supabaseClient";
 import App from "./App.jsx";
 import SignIn from "./components/SignIn.jsx";
 import SignUp from "./components/SignUp.jsx";
-
-const API_URL = "https://student-json-server-1.onrender.com";
 
 export default function MainPage() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [showLogin, setShowLogin] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
-  const [role, setRole] = useState("");
+  const [session, setSession] = useState(null);
 
   useEffect(() => {
-    axios
-      .get(`${API_URL}/feedbacks?visible=true`)
-      .then((res) => setFeedbacks(res.data))
-      .catch(console.error);
+    // Fetch initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) {
+        setShowLogin(false);
+        setShowSignUp(false);
+      }
+    });
+
+    // Fetch visible feedbacks
+    fetchVisibleFeedbacks();
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // ✔ FIXED login
-  const handleLoginSuccess = (username, role) => {
-    setUsername(username);
-    setRole(role);
-    setIsLoggedIn(true);
-    setShowLogin(false);
-    setShowSignUp(false);
-  };
-
-  const handleLogout = () => {
-    setUsername("");
-    setRole("");
-    setIsLoggedIn(false);
-    setShowLogin(false);
-    setShowSignUp(false);
+  const fetchVisibleFeedbacks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('feedbacks')
+        .select('*')
+        .eq('visible', true)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setFeedbacks(data || []);
+    } catch (err) {
+      console.error("Error fetching feedbacks:", err);
+    }
   };
 
   // Render Login / Sign Up page
-  if (!isLoggedIn && (showLogin || showSignUp)) {
+  if (!session && (showLogin || showSignUp)) {
     return showSignUp ? (
-      <SignUp onSignUpSuccess={handleLoginSuccess} />
+      <SignUp onSignUpSuccess={() => { setShowSignUp(false); setShowLogin(true); }} />
     ) : (
       <SignIn
-        onLoginSuccess={handleLoginSuccess}
-        onShowSignUp={() => setShowSignUp(true)}
+        onLoginSuccess={() => setShowLogin(false)}
+        onShowSignUp={() => { setShowLogin(false); setShowSignUp(true); }}
       />
     );
   }
 
-  // If logged in → go to Dashboard
-  if (isLoggedIn) {
-    return <App username={username} role={role} onLogout={handleLogout} />;
+  // If logged in → go to App (which acts as the Dashboard)
+  if (session) {
+    return <App />;
   }
 
   // -----------------------------
@@ -98,7 +105,7 @@ export default function MainPage() {
             >
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold text-gray-700">
-                  {f.studentUsername}
+                  {f.student_username}
                 </span>
 
                 <span className="text-yellow-500 font-bold text-lg">

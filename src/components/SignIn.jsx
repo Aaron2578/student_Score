@@ -1,32 +1,27 @@
 import { useState } from "react";
-import axios from "axios";
-
-const API_URL = "https://student-json-server-1.onrender.com";
+import { supabase } from "../supabaseClient";
 
 export default function SignIn({ onLoginSuccess, onShowSignUp }) {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!username || !password) return alert("Enter username and password");
+    if (!email || !password) return alert("Enter email and password");
 
     try {
       setLoading(true);
-      const res = await axios.get(
-        `${API_URL}/users?username=${username}&password=${password}`
-      );
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-      if (res.data.length === 0) {
-        alert("Invalid credentials");
+      if (error) {
+        alert(error.message);
       } else {
-        const user = res.data[0];
-
-        // SAVE LOGIN IN LOCAL STORAGE
-        localStorage.setItem("username", user.username);
-        localStorage.setItem("role", user.role);
-
-        onLoginSuccess(user.username, user.role); // notify parent
+        // onLoginSuccess is still called for backward compatibility if needed, 
+        // though App.jsx handles session changes now.
+        onLoginSuccess(data.user.email, "user"); 
       }
     } catch (err) {
       console.error(err);
@@ -45,10 +40,10 @@ export default function SignIn({ onLoginSuccess, onShowSignUp }) {
 
         <div className="space-y-4">
           <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="border w-full p-3 rounded-lg text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
 
